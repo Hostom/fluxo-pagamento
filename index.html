@@ -169,6 +169,27 @@
           </div>
         </div>
 
+        <!-- SEÇÃO: IMAGEM DE FUNDO DO PDF -->
+        <div class="config-section" data-section="pdf-bg">
+          <h3 class="section-title"><i data-lucide="image"></i> Fundo da Proposta (PDF)</h3>
+          <div class="input-group">
+            <label for="input-pdf-bg-file" style="cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px dashed var(--border-strong); border-radius: var(--r-sm); justify-content: center; font-weight: 600; font-size: 11px;">
+              <i data-lucide="upload" style="width: 14px; height: 14px; color: var(--primary);"></i>
+              Escolher Foto / Marca d'água
+            </label>
+            <input type="file" id="input-pdf-bg-file" accept="image/*" style="display: none;">
+            <span class="helper-text mt-3">Carregue a foto do empreendimento para o fundo da proposta.</span>
+          </div>
+          <div class="input-group mt-3" id="group-pdf-bg-opacity" style="display: none;">
+            <label for="input-pdf-bg-opacity" style="display: flex; justify-content: space-between;">
+              <span>Opacidade da Foto</span>
+              <strong id="lbl-pdf-bg-opacity">8%</strong>
+            </label>
+            <input type="range" id="input-pdf-bg-opacity" min="1" max="40" step="1" value="8" style="accent-color: var(--primary); width: 100%;">
+            <button class="btn-sec text-danger mt-3" id="btn-pdf-bg-clear" type="button" style="width: 100%;">Remover Fundo</button>
+          </div>
+        </div>
+
       </div>
     </aside>
 
@@ -299,6 +320,9 @@
 
   <!-- ================= PRINT TEMPLATE (PDF) ================= -->
   <div id="print-template" class="print-only">
+    
+    <!-- Imagem de Fundo (Marca d'água / Foto Empreendimento) -->
+    <div class="print-watermark-bg" id="print-watermark-bg"></div>
 
     <!-- CABEÇALHO EXECUTIVO -->
     <header class="print-header">

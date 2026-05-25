@@ -856,6 +856,20 @@ tr.reforco td { font-weight: 600; }
   width: 210mm; /* Largura perfeita de uma página A4 */
   padding: 12mm 14mm; /* Margens internas aplicadas diretamente no contêiner para evitar cortes no canvas */
   background: #ffffff;
+  position: relative; /* Necessário para posicionamento absoluto da marca d'água */
+  z-index: 1;
+}
+
+#print-template .print-watermark-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.08; /* Controlado dinamicamente via JS */
+  transition: opacity 0.25s ease;
 }
 
 #print-template * {

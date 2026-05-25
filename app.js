@@ -41,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const elTabelaDashboard        = document.getElementById('tabela-dashboard');
   const elBtnImprimir            = document.getElementById('btn-imprimir');
   const elBtnBaixarPdf           = document.getElementById('btn-baixar-pdf');
+  const elInputPdfBgFile         = document.getElementById('input-pdf-bg-file');
+  const elGroupPdfBgOpacity      = document.getElementById('group-pdf-bg-opacity');
+  const elInputPdfBgOpacity      = document.getElementById('input-pdf-bg-opacity');
+  const elLblPdfBgOpacity        = document.getElementById('lbl-pdf-bg-opacity');
+  const elBtnPdfBgClear          = document.getElementById('btn-pdf-bg-clear');
+  const elPrintWatermarkBg       = document.getElementById('print-watermark-bg');
 
   // ── Configuração de gráficos e temas ──────────────────────────────────────
   let chartDashboard = null;
@@ -123,6 +129,42 @@ document.addEventListener('DOMContentLoaded', () => {
     elValCubProjetado.textContent = v.toFixed(1).replace('.', ',') + '% a.a.';
     processarSimulacao();
   });
+
+  // ── Controle de Imagem de Fundo do PDF (Marca d'água) ──────────────────────
+  if (elInputPdfBgFile) {
+    elInputPdfBgFile.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          if (elPrintWatermarkBg) {
+            elPrintWatermarkBg.style.backgroundImage = `url(${e.target.result})`;
+            elPrintWatermarkBg.style.opacity = (elInputPdfBgOpacity.value || 8) / 100;
+          }
+          if (elGroupPdfBgOpacity) {
+            elGroupPdfBgOpacity.style.display = 'block';
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (elInputPdfBgOpacity) {
+    elInputPdfBgOpacity.addEventListener('input', function () {
+      const v = this.value;
+      if (elLblPdfBgOpacity) elLblPdfBgOpacity.textContent = v + '%';
+      if (elPrintWatermarkBg) elPrintWatermarkBg.style.opacity = v / 100;
+    });
+  }
+
+  if (elBtnPdfBgClear) {
+    elBtnPdfBgClear.addEventListener('click', () => {
+      if (elInputPdfBgFile) elInputPdfBgFile.value = '';
+      if (elPrintWatermarkBg) elPrintWatermarkBg.style.backgroundImage = 'none';
+      if (elGroupPdfBgOpacity) elGroupPdfBgOpacity.style.display = 'none';
+    });
+  }
 
   // ── Cálculo de parcelas ────────────────────────────────────────────────────
   function calcularParcelas(cubAnual, config) {
