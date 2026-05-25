@@ -3,27 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador de Fluxo de Pagamento Imobiliário</title>
+  <title>Simulador de Fluxo de Pagamento Imobiliário | Antigravity</title>
+  <meta name="description" content="Simule, projete e exporte propostas comerciais de fluxo de pagamento imobiliário com reajuste CUB em tempo real.">
   <!-- Google Fonts: Outfit e Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Lucide Icons para visual moderno -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="theme-blue">
 
+  <!-- ========== ELEMENTOS DE PROFUNDIDADE ESPACIAL (FUNDO) ========== -->
+  <div class="bg-layer" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-mesh"></div>
+  </div>
+
   <!-- ================= DASHBOARD EDITOR (ONLINE VIEW) ================= -->
   <div id="app-container">
-    
-    <!-- BARRA LATERAL DE CONFIGURAÇÃO (CONTROLES) -->
+
+    <!-- BARRA LATERAL DE CONFIGURAÇÃO -->
     <aside class="sidebar no-print">
       <div class="sidebar-header">
         <div class="logo-wrapper">
-          <i data-lucide="building-2" class="logo-icon"></i>
+          <div class="logo-icon-wrap">
+            <i data-lucide="building-2" class="logo-icon"></i>
+          </div>
           <div>
             <h2>Antigravity</h2>
             <span>Gestor de Propostas</span>
@@ -32,16 +45,17 @@
       </div>
 
       <div class="sidebar-scroll">
+
         <!-- SEÇÃO: TEMA E IDENTIDADE -->
-        <div class="config-section">
-          <h3 class="section-title"><i data-lucide="palette"></i> Identidade & Cores</h3>
+        <div class="config-section" data-section="theme">
+          <h3 class="section-title"><i data-lucide="palette"></i> Identidade &amp; Cores</h3>
           <div class="theme-selector">
-            <button class="theme-btn active" data-theme="blue" title="Azul Corporativo" style="background: #185FA5;"></button>
-            <button class="theme-btn" data-theme="emerald" title="Verde Esmeralda" style="background: #0f766e;"></button>
-            <button class="theme-btn" data-theme="gold" title="Dourado Prestige" style="background: #b45309;"></button>
-            <button class="theme-btn" data-theme="charcoal" title="Modern Charcoal" style="background: #374151;"></button>
+            <button class="theme-btn active" data-theme="blue" title="Azul Corporativo" style="background: linear-gradient(135deg,#1e7fcb,#0d4f8c);"></button>
+            <button class="theme-btn" data-theme="emerald" title="Verde Esmeralda" style="background: linear-gradient(135deg,#10b981,#0f766e);"></button>
+            <button class="theme-btn" data-theme="gold" title="Dourado Prestige" style="background: linear-gradient(135deg,#f59e0b,#b45309);"></button>
+            <button class="theme-btn" data-theme="violet" title="Violeta Premium" style="background: linear-gradient(135deg,#8b5cf6,#6d28d9);"></button>
           </div>
-          
+
           <div class="input-group mt-3">
             <label for="input-corretora">Imobiliária / Construtora</label>
             <input type="text" id="input-corretora" value="Imobiliária Antigravity" placeholder="Nome da empresa">
@@ -49,7 +63,7 @@
         </div>
 
         <!-- SEÇÃO: DADOS DO CLIENTE -->
-        <div class="config-section">
+        <div class="config-section" data-section="client">
           <h3 class="section-title"><i data-lucide="user"></i> Dados do Cliente</h3>
           <div class="input-group">
             <label for="input-cliente-nome">Nome do Proponente</label>
@@ -68,7 +82,7 @@
         </div>
 
         <!-- SEÇÃO: DADOS DO IMÓVEL -->
-        <div class="config-section">
+        <div class="config-section" data-section="property">
           <h3 class="section-title"><i data-lucide="home"></i> Dados do Imóvel</h3>
           <div class="input-group">
             <label for="input-imovel-nome">Nome do Empreendimento</label>
@@ -97,7 +111,7 @@
         </div>
 
         <!-- SEÇÃO: VALORES DO FLUXO -->
-        <div class="config-section">
+        <div class="config-section" data-section="values">
           <h3 class="section-title"><i data-lucide="dollar-sign"></i> Valores de Tabela</h3>
           <div class="input-group">
             <label for="input-valor-total">Valor Total do Imóvel (R$)</label>
@@ -119,34 +133,34 @@
           </div>
         </div>
 
-        <!-- SEÇÃO: CONFIGURAÇÃO DE REFORÇOS (BALÕES) -->
-        <div class="config-section">
-          <h3 class="section-title"><i data-lucide="calendar"></i> Reforços (Balões semestrais/anuais)</h3>
-          
+        <!-- SEÇÃO: REFORÇOS -->
+        <div class="config-section" data-section="balloons">
+          <h3 class="section-title"><i data-lucide="calendar"></i> Reforços (Balões)</h3>
+
           <div class="input-group">
             <label for="input-valor-reforco">Valor de Cada Reforço (R$)</label>
             <input type="text" class="money-input" id="input-valor-reforco" value="31.257,98">
           </div>
-          
+
           <div class="input-group">
             <label>Gerar Reforços Automaticamente</label>
             <div class="btn-grid">
-              <button class="btn-sec font-sm" id="btn-reforco-semestral">Semestral (6, 12, ...)</button>
-              <button class="btn-sec font-sm" id="btn-reforco-anual">Anual (12, 24, ...)</button>
-              <button class="btn-sec font-sm text-danger" id="btn-reforco-limpar">Limpar Tudo</button>
+              <button class="btn-sec font-sm" id="btn-reforco-semestral"><i data-lucide="calendar-range"></i> Semestral</button>
+              <button class="btn-sec font-sm" id="btn-reforco-anual"><i data-lucide="calendar-check"></i> Anual</button>
+              <button class="btn-sec font-sm text-danger" id="btn-reforco-limpar"><i data-lucide="trash-2"></i> Limpar Tudo</button>
             </div>
           </div>
 
           <div class="input-group">
-            <label for="input-reforcos-meses">Meses com Reforço (Separados por vírgula)</label>
+            <label for="input-reforcos-meses">Meses com Reforço (separados por vírgula)</label>
             <input type="text" id="input-reforcos-meses" value="6, 12, 18, 24, 30, 36, 42, 48" placeholder="Ex: 6, 12, 18, 24">
-            <span class="helper-text">Adicione ou remova os meses manualmente para fluxos customizados.</span>
+            <span class="helper-text">Adicione ou remova meses manualmente para fluxos customizados.</span>
           </div>
         </div>
 
-        <!-- SEÇÃO: OBSERVAÇÕES E PROPOSTA -->
-        <div class="config-section">
-          <h3 class="section-title"><i data-lucide="file-text"></i> Termos & Observações</h3>
+        <!-- SEÇÃO: OBSERVAÇÕES -->
+        <div class="config-section" data-section="notes">
+          <h3 class="section-title"><i data-lucide="file-text"></i> Termos &amp; Observações</h3>
           <div class="input-group">
             <label for="input-observacoes">Observações na Proposta</label>
             <textarea id="input-observacoes" rows="4" placeholder="Condições gerais, validade da proposta...">O saldo restante de R$ 380.000,00 será liquidado via financiamento bancário ou recursos próprios no momento da entrega das chaves. A proposta é sujeita a análise de crédito.</textarea>
@@ -156,49 +170,67 @@
       </div>
     </aside>
 
-    <!-- ÁREA DE VISUALIZAÇÃO DO SIMULADOR -->
+    <!-- ÁREA PRINCIPAL DE VISUALIZAÇÃO -->
     <main class="main-content no-print">
       <header class="main-header">
         <div class="header-info">
+          <div class="header-eyebrow"><i data-lucide="trending-up"></i> Análise em Tempo Real</div>
           <h1>Simulador de Fluxo de Pagamento</h1>
-          <p>Configure os parâmetros à esquerda para gerar o fluxo financeiro reajustado em tempo real.</p>
+          <p>Configure os parâmetros ao lado para projetar o fluxo financeiro reajustado pelo <span class="lbl-indexador">CUB/SC</span>.</p>
         </div>
         <div class="header-actions">
           <button class="btn-primary" id="btn-imprimir">
-            <i data-lucide="printer"></i> Gerar PDF Profissional
+            <i data-lucide="file-down"></i>
+            Gerar PDF Profissional
           </button>
         </div>
       </header>
 
       <!-- CARDS DE MÉTRICAS -->
-      <section class="metrics-grid">
-        <div class="metric-card bg-primary-glass">
-          <span class="metric-label">Valor Total do Imóvel</span>
-          <span class="metric-value" id="val-total">R$ 822.363,64</span>
-          <span class="metric-desc">Tabela de vendas original</span>
-        </div>
-        
-        <div class="metric-card">
-          <span class="metric-label">Entrada / Sinal</span>
-          <span class="metric-value" id="val-entrada">R$ 60.000,00</span>
-          <span class="metric-desc">Pago no ato da assinatura</span>
+      <section class="metrics-grid" id="metrics-grid">
+        <div class="metric-card tilt-card" id="mc-total">
+          <div class="metric-card-inner">
+            <div class="metric-icon-wrap"><i data-lucide="landmark"></i></div>
+            <span class="metric-label">Valor Total do Imóvel</span>
+            <span class="metric-value" id="val-total">R$ 822.363,64</span>
+            <span class="metric-desc">Tabela de vendas original</span>
+          </div>
+          <div class="card-glow"></div>
         </div>
 
-        <div class="metric-card border-accent">
-          <span class="metric-label">Pago até as Chaves</span>
-          <span class="metric-value text-accent" id="val-pago">—</span>
-          <span class="metric-desc" id="lbl-total-meses">Parcelas + Reforços corrigidos</span>
+        <div class="metric-card tilt-card" id="mc-entrada">
+          <div class="metric-card-inner">
+            <div class="metric-icon-wrap"><i data-lucide="key-round"></i></div>
+            <span class="metric-label">Entrada / Sinal</span>
+            <span class="metric-value" id="val-entrada">R$ 60.000,00</span>
+            <span class="metric-desc">Pago no ato da assinatura</span>
+          </div>
+          <div class="card-glow"></div>
         </div>
 
-        <div class="metric-card">
-          <span class="metric-label">Saldo a Financiar nas Chaves</span>
-          <span class="metric-value" id="val-saldo">—</span>
-          <span class="metric-desc">Valores não cobertos neste fluxo</span>
+        <div class="metric-card tilt-card accent-card" id="mc-pago">
+          <div class="metric-card-inner">
+            <div class="metric-icon-wrap accent"><i data-lucide="wallet"></i></div>
+            <span class="metric-label">Pago até as Chaves</span>
+            <span class="metric-value text-accent" id="val-pago">—</span>
+            <span class="metric-desc" id="lbl-total-meses">Parcelas + Reforços corrigidos</span>
+          </div>
+          <div class="card-glow accent"></div>
+        </div>
+
+        <div class="metric-card tilt-card" id="mc-saldo">
+          <div class="metric-card-inner">
+            <div class="metric-icon-wrap"><i data-lucide="banknote"></i></div>
+            <span class="metric-label">Saldo a Financiar nas Chaves</span>
+            <span class="metric-value" id="val-saldo">—</span>
+            <span class="metric-desc">Valores não cobertos neste fluxo</span>
+          </div>
+          <div class="card-glow"></div>
         </div>
       </section>
 
-      <!-- SEÇÃO DE CONTROLE DE PROJEÇÃO DE CUB -->
-      <div class="cub-slider-card">
+      <!-- CONTROLE DE PROJEÇÃO DE CUB -->
+      <div class="cub-slider-card glass-card" id="cub-card">
         <div class="cub-slider-info">
           <div>
             <h4>Projeção Anual do Reajuste (<span class="lbl-indexador">CUB/SC</span>)</h4>
@@ -207,17 +239,19 @@
           <div class="cub-current-value" id="val-cub-projetado">5,0% a.a.</div>
         </div>
         <div class="slider-wrapper">
-          <span>2.0%</span>
-          <input type="range" id="input-cub-rate" min="0" max="15" step="0.1" value="5">
-          <span>15.0%</span>
+          <span>0%</span>
+          <div class="slider-track-wrap">
+            <input type="range" id="input-cub-rate" min="0" max="15" step="0.1" value="5">
+          </div>
+          <span>15%</span>
         </div>
         <div class="cub-details-summary" id="cub-details-summary">
           Parcelas mensais reajustadas mês a mês com juros acumulados equivalentes à taxa anual informada.
         </div>
       </div>
 
-      <!-- VISUALIZAÇÃO GRÁFICA -->
-      <section class="chart-section">
+      <!-- GRÁFICO -->
+      <section class="chart-section glass-card" id="chart-section">
         <div class="section-header-row">
           <h3><i data-lucide="bar-chart-3"></i> Projeção de Desembolsos Mensais</h3>
           <div class="chart-legend">
@@ -230,10 +264,10 @@
         </div>
       </section>
 
-      <!-- TABELA DE DESCRITIVOS -->
-      <section class="table-section">
+      <!-- TABELA -->
+      <section class="table-section glass-card" id="table-section">
         <div class="section-header-row border-bottom">
-          <h3><i data-lucide="list"></i> Cronograma Completo de Desembolsos</h3>
+          <h3><i data-lucide="table-2"></i> Cronograma Completo de Desembolsos</h3>
           <span class="badge" id="badge-meses">51 parcelas</span>
         </div>
         <div class="table-container">
@@ -257,11 +291,12 @@
 
   </div>
 
-  <!-- ================= PRINT TEMPLATE (ONLY VISIBLE IN PRINT/PDF) ================= -->
+  <!-- ================= PRINT TEMPLATE (PDF) ================= -->
   <div id="print-template" class="print-only">
-    
+
     <!-- CABEÇALHO EXECUTIVO -->
     <header class="print-header">
+      <div class="print-header-bar"></div>
       <div class="print-brand-row">
         <div class="print-logo">
           <i data-lucide="building-2" class="print-logo-icon"></i>
@@ -273,12 +308,13 @@
         <div class="print-meta-right">
           <div class="print-meta-item"><strong>Data:</strong> <span id="print-data-emissao">--/--/----</span></div>
           <div class="print-meta-item"><strong>Validade:</strong> 7 dias úteis</div>
+          <div class="print-meta-badge">PROPOSTA COMERCIAL</div>
         </div>
       </div>
-      
+
       <div class="print-divider"></div>
-      
-      <!-- SUB-CABEÇALHO: DADOS DO CLIENTE & IMÓVEL -->
+
+      <!-- DADOS DO CLIENTE & IMÓVEL -->
       <div class="print-info-grid">
         <div class="print-info-block">
           <h3><i data-lucide="user"></i> Proponente</h3>
@@ -295,9 +331,9 @@
       </div>
     </header>
 
-    <!-- RESUMO FINANCEIRO NA PROPOSTA -->
+    <!-- RESUMO FINANCEIRO -->
     <section class="print-section">
-      <h2 class="print-section-title">Resumo Financeiro da Proposta</h2>
+      <h2 class="print-section-title"><span class="title-bar"></span>Resumo Financeiro da Proposta</h2>
       <div class="print-metrics-summary">
         <div class="print-summary-card">
           <span class="lbl">Valor de Tabela</span>
@@ -321,23 +357,23 @@
 
     <!-- GRÁFICO IMPRESSO -->
     <section class="print-section page-break-avoid">
-      <h2 class="print-section-title">Projeção Visual de Fluxo</h2>
+      <h2 class="print-section-title"><span class="title-bar"></span>Projeção Visual de Fluxo</h2>
       <div class="print-chart-container">
         <canvas id="grafico-print"></canvas>
       </div>
     </section>
 
-    <div class="page-break"></div> <!-- Forçar quebra de página se a tabela for grande -->
+    <div class="page-break"></div>
 
-    <!-- TABELA COMPLETA IMPRESSA -->
+    <!-- TABELA COMPLETA -->
     <section class="print-section">
-      <h2 class="print-section-title">Detalhamento das Parcelas do Fluxo</h2>
+      <h2 class="print-section-title"><span class="title-bar"></span>Detalhamento das Parcelas do Fluxo</h2>
       <p class="print-section-subtitle">
-        * As parcelas listadas abaixo foram calculadas com base em um reajuste mensal estimado de 
-        <strong id="print-val-cub-estimado">--% a.a.</strong> indexado ao 
+        * Parcelas calculadas com reajuste estimado de
+        <strong id="print-val-cub-estimado">--% a.a.</strong> indexado ao
         <strong id="print-val-indexador-nome">--</strong> (Base: <span id="print-val-indexador-base">--</span>).
       </p>
-      
+
       <table class="print-table">
         <thead>
           <tr>
@@ -365,7 +401,6 @@
         </p>
       </div>
 
-      <!-- CAMPOS DE ASSINATURA -->
       <div class="print-signature-row">
         <div class="print-signature-block">
           <div class="signature-line"></div>
