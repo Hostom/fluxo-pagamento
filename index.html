@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Fluxo de Pagamento Imobiliário</title>
+  <!-- Google Fonts: Outfit e Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons para visual moderno -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-blue">
+
+  <!-- ================= DASHBOARD EDITOR (ONLINE VIEW) ================= -->
+  <div id="app-container">
+    
+    <!-- BARRA LATERAL DE CONFIGURAÇÃO (CONTROLES) -->
+    <aside class="sidebar no-print">
+      <div class="sidebar-header">
+        <div class="logo-wrapper">
+          <i data-lucide="building-2" class="logo-icon"></i>
+          <div>
+            <h2>Antigravity</h2>
+            <span>Gestor de Propostas</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-scroll">
+        <!-- SEÇÃO: TEMA E IDENTIDADE -->
+        <div class="config-section">
+          <h3 class="section-title"><i data-lucide="palette"></i> Identidade & Cores</h3>
+          <div class="theme-selector">
+            <button class="theme-btn active" data-theme="blue" title="Azul Corporativo" style="background: #185FA5;"></button>
+            <button class="theme-btn" data-theme="emerald" title="Verde Esmeralda" style="background: #0f766e;"></button>
+            <button class="theme-btn" data-theme="gold" title="Dourado Prestige" style="background: #b45309;"></button>
+            <button class="theme-btn" data-theme="charcoal" title="Modern Charcoal" style="background: #374151;"></button>
+          </div>
+          
+          <div class="input-group mt-3">
+            <label for="input-corretora">Imobiliária / Construtora</label>
+            <input type="text" id="input-corretora" value="Imobiliária Antigravity" placeholder="Nome da empresa">
+          </div>
+        </div>
+
+        <!-- SEÇÃO: DADOS DO CLIENTE -->
+        <div class="config-section">
+          <h3 class="section-title"><i data-lucide="user"></i> Dados do Cliente</h3>
+          <div class="input-group">
+            <label for="input-cliente-nome">Nome do Proponente</label>
+            <input type="text" id="input-cliente-nome" value="Carlos Eduardo Mendonça" placeholder="Nome completo">
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label for="input-cliente-email">E-mail</label>
+              <input type="email" id="input-cliente-email" value="carlos.mendonca@email.com" placeholder="email@exemplo.com">
+            </div>
+            <div class="input-group">
+              <label for="input-cliente-fone">Telefone</label>
+              <input type="text" id="input-cliente-fone" value="(47) 99876-5432" placeholder="(00) 00000-0000">
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO: DADOS DO IMÓVEL -->
+        <div class="config-section">
+          <h3 class="section-title"><i data-lucide="home"></i> Dados do Imóvel</h3>
+          <div class="input-group">
+            <label for="input-imovel-nome">Nome do Empreendimento</label>
+            <input type="text" id="input-imovel-nome" value="Residencial Splendor Park" placeholder="Nome do prédio">
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label for="input-imovel-unidade">Unidade / Apto</label>
+              <input type="text" id="input-imovel-unidade" value="Apartamento 604" placeholder="Ex: Apto 604">
+            </div>
+            <div class="input-group">
+              <label for="input-imovel-detalhes">Tipologia / Descrição</label>
+              <input type="text" id="input-imovel-detalhes" value="1 suíte + 1 · 61,9 m² · 1 vaga" placeholder="Tipologia, área, etc.">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label for="input-imovel-indexador">Indexador de Reajuste</label>
+              <input type="text" id="input-imovel-indexador" value="CUB/SC" placeholder="Ex: CUB/SC, INCC">
+            </div>
+            <div class="input-group">
+              <label for="input-imovel-indexador-base">Valor Base do Indexador</label>
+              <input type="text" id="input-imovel-indexador-base" value="maio/2026 = R$ 3.064,10" placeholder="Ex: maio/2026 = R$ 3.064,10">
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO: VALORES DO FLUXO -->
+        <div class="config-section">
+          <h3 class="section-title"><i data-lucide="dollar-sign"></i> Valores de Tabela</h3>
+          <div class="input-group">
+            <label for="input-valor-total">Valor Total do Imóvel (R$)</label>
+            <input type="text" class="money-input" id="input-valor-total" value="822.363,64">
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label for="input-valor-entrada">Valor da Entrada (R$)</label>
+              <input type="text" class="money-input" id="input-valor-entrada" value="60.000,00">
+            </div>
+            <div class="input-group">
+              <label for="input-valor-parcela">Parcela Mensal Base (R$)</label>
+              <input type="text" class="money-input" id="input-valor-parcela" value="4.031,19">
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="input-meses">Total de Meses do Fluxo</label>
+            <input type="number" id="input-meses" min="1" max="120" value="51">
+          </div>
+        </div>
+
+        <!-- SEÇÃO: CONFIGURAÇÃO DE REFORÇOS (BALÕES) -->
+        <div class="config-section">
+          <h3 class="section-title"><i data-lucide="calendar"></i> Reforços (Balões semestrais/anuais)</h3>
+          
+          <div class="input-group">
+            <label for="input-valor-reforco">Valor de Cada Reforço (R$)</label>
+            <input type="text" class="money-input" id="input-valor-reforco" value="31.257,98">
+          </div>
+          
+          <div class="input-group">
+            <label>Gerar Reforços Automaticamente</label>
+            <div class="btn-grid">
+              <button class="btn-sec font-sm" id="btn-reforco-semestral">Semestral (6, 12, ...)</button>
+              <button class="btn-sec font-sm" id="btn-reforco-anual">Anual (12, 24, ...)</button>
+              <button class="btn-sec font-sm text-danger" id="btn-reforco-limpar">Limpar Tudo</button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="input-reforcos-meses">Meses com Reforço (Separados por vírgula)</label>
+            <input type="text" id="input-reforcos-meses" value="6, 12, 18, 24, 30, 36, 42, 48" placeholder="Ex: 6, 12, 18, 24">
+            <span class="helper-text">Adicione ou remova os meses manualmente para fluxos customizados.</span>
+          </div>
+        </div>
+
+        <!-- SEÇÃO: OBSERVAÇÕES E PROPOSTA -->
+        <div class="config-section">
+          <h3 class="section-title"><i data-lucide="file-text"></i> Termos & Observações</h3>
+          <div class="input-group">
+            <label for="input-observacoes">Observações na Proposta</label>
+            <textarea id="input-observacoes" rows="4" placeholder="Condições gerais, validade da proposta...">O saldo restante de R$ 380.000,00 será liquidado via financiamento bancário ou recursos próprios no momento da entrega das chaves. A proposta é sujeita a análise de crédito.</textarea>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ÁREA DE VISUALIZAÇÃO DO SIMULADOR -->
+    <main class="main-content no-print">
+      <header class="main-header">
+        <div class="header-info">
+          <h1>Simulador de Fluxo de Pagamento</h1>
+          <p>Configure os parâmetros à esquerda para gerar o fluxo financeiro reajustado em tempo real.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-primary" id="btn-imprimir">
+            <i data-lucide="printer"></i> Gerar PDF Profissional
+          </button>
+        </div>
+      </header>
+
+      <!-- CARDS DE MÉTRICAS -->
+      <section class="metrics-grid">
+        <div class="metric-card bg-primary-glass">
+          <span class="metric-label">Valor Total do Imóvel</span>
+          <span class="metric-value" id="val-total">R$ 822.363,64</span>
+          <span class="metric-desc">Tabela de vendas original</span>
+        </div>
+        
+        <div class="metric-card">
+          <span class="metric-label">Entrada / Sinal</span>
+          <span class="metric-value" id="val-entrada">R$ 60.000,00</span>
+          <span class="metric-desc">Pago no ato da assinatura</span>
+        </div>
+
+        <div class="metric-card border-accent">
+          <span class="metric-label">Pago até as Chaves</span>
+          <span class="metric-value text-accent" id="val-pago">—</span>
+          <span class="metric-desc" id="lbl-total-meses">Parcelas + Reforços corrigidos</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-label">Saldo a Financiar nas Chaves</span>
+          <span class="metric-value" id="val-saldo">—</span>
+          <span class="metric-desc">Valores não cobertos neste fluxo</span>
+        </div>
+      </section>
+
+      <!-- SEÇÃO DE CONTROLE DE PROJEÇÃO DE CUB -->
+      <div class="cub-slider-card">
+        <div class="cub-slider-info">
+          <div>
+            <h4>Projeção Anual do Reajuste (<span class="lbl-indexador">CUB/SC</span>)</h4>
+            <p>Arraste o slider para simular o impacto inflacionário ao longo do tempo.</p>
+          </div>
+          <div class="cub-current-value" id="val-cub-projetado">5,0% a.a.</div>
+        </div>
+        <div class="slider-wrapper">
+          <span>2.0%</span>
+          <input type="range" id="input-cub-rate" min="0" max="15" step="0.1" value="5">
+          <span>15.0%</span>
+        </div>
+        <div class="cub-details-summary" id="cub-details-summary">
+          Parcelas mensais reajustadas mês a mês com juros acumulados equivalentes à taxa anual informada.
+        </div>
+      </div>
+
+      <!-- VISUALIZAÇÃO GRÁFICA -->
+      <section class="chart-section">
+        <div class="section-header-row">
+          <h3><i data-lucide="bar-chart-3"></i> Projeção de Desembolsos Mensais</h3>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot bg-primary"></span> Parcela Mensal</span>
+            <span class="legend-item"><span class="dot bg-success"></span> Reforço + Parcela</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="grafico-dashboard"></canvas>
+        </div>
+      </section>
+
+      <!-- TABELA DE DESCRITIVOS -->
+      <section class="table-section">
+        <div class="section-header-row border-bottom">
+          <h3><i data-lucide="list"></i> Cronograma Completo de Desembolsos</h3>
+          <span class="badge" id="badge-meses">51 parcelas</span>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Mês</th>
+                <th>Parcela Corrigida</th>
+                <th>Reforço Adicional</th>
+                <th>Desembolso Total</th>
+                <th>Total Acumulado</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-dashboard">
+              <!-- Gerado dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- ================= PRINT TEMPLATE (ONLY VISIBLE IN PRINT/PDF) ================= -->
+  <div id="print-template" class="print-only">
+    
+    <!-- CABEÇALHO EXECUTIVO -->
+    <header class="print-header">
+      <div class="print-brand-row">
+        <div class="print-logo">
+          <i data-lucide="building-2" class="print-logo-icon"></i>
+          <div>
+            <h1 id="print-txt-corretora">Imobiliária Antigravity</h1>
+            <p>Proposta Comercial de Vendas</p>
+          </div>
+        </div>
+        <div class="print-meta-right">
+          <div class="print-meta-item"><strong>Data:</strong> <span id="print-data-emissao">--/--/----</span></div>
+          <div class="print-meta-item"><strong>Validade:</strong> 7 dias úteis</div>
+        </div>
+      </div>
+      
+      <div class="print-divider"></div>
+      
+      <!-- SUB-CABEÇALHO: DADOS DO CLIENTE & IMÓVEL -->
+      <div class="print-info-grid">
+        <div class="print-info-block">
+          <h3><i data-lucide="user"></i> Proponente</h3>
+          <p><strong id="print-txt-cliente-nome">Carlos Eduardo Mendonça</strong></p>
+          <p>E-mail: <span id="print-txt-cliente-email">carlos.mendonca@email.com</span></p>
+          <p>Telefone: <span id="print-txt-cliente-fone">(47) 99876-5432</span></p>
+        </div>
+        <div class="print-info-block">
+          <h3><i data-lucide="home"></i> Empreendimento / Unidade</h3>
+          <p><strong id="print-txt-imovel-nome">Residencial Splendor Park</strong></p>
+          <p>Unidade: <span id="print-txt-imovel-unidade">Apartamento 604</span></p>
+          <p>Detalhes: <span id="print-txt-imovel-detalhes">1 suíte + 1 · 61,9 m² · 1 vaga</span></p>
+        </div>
+      </div>
+    </header>
+
+    <!-- RESUMO FINANCEIRO NA PROPOSTA -->
+    <section class="print-section">
+      <h2 class="print-section-title">Resumo Financeiro da Proposta</h2>
+      <div class="print-metrics-summary">
+        <div class="print-summary-card">
+          <span class="lbl">Valor de Tabela</span>
+          <span class="val" id="print-val-total">R$ --</span>
+        </div>
+        <div class="print-summary-card">
+          <span class="lbl">Sinal / Entrada</span>
+          <span class="val" id="print-val-entrada">R$ --</span>
+        </div>
+        <div class="print-summary-card highlighted">
+          <span class="lbl">Fluxo até Chaves (Simulado)</span>
+          <span class="val" id="print-val-pago-fluxo">R$ --</span>
+          <span class="sub-lbl" id="print-lbl-reajuste">Projeção: --% a.a. indexado ao --</span>
+        </div>
+        <div class="print-summary-card">
+          <span class="lbl">Saldo de Quitação (Nas Chaves)</span>
+          <span class="val" id="print-val-saldo-chaves">R$ --</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRÁFICO IMPRESSO -->
+    <section class="print-section page-break-avoid">
+      <h2 class="print-section-title">Projeção Visual de Fluxo</h2>
+      <div class="print-chart-container">
+        <canvas id="grafico-print"></canvas>
+      </div>
+    </section>
+
+    <div class="page-break"></div> <!-- Forçar quebra de página se a tabela for grande -->
+
+    <!-- TABELA COMPLETA IMPRESSA -->
+    <section class="print-section">
+      <h2 class="print-section-title">Detalhamento das Parcelas do Fluxo</h2>
+      <p class="print-section-subtitle">
+        * As parcelas listadas abaixo foram calculadas com base em um reajuste mensal estimado de 
+        <strong id="print-val-cub-estimado">--% a.a.</strong> indexado ao 
+        <strong id="print-val-indexador-nome">--</strong> (Base: <span id="print-val-indexador-base">--</span>).
+      </p>
+      
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>Mês</th>
+            <th>Parcela Corrigida</th>
+            <th>Reforço Opcional</th>
+            <th>Desembolso Mensal</th>
+            <th>Acumulado Simulado</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-print">
+          <!-- Gerado dinamicamente -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- OBSERVAÇÕES E ASSINATURAS -->
+    <section class="print-section print-footer-terms page-break-avoid">
+      <div class="print-terms">
+        <h3>Cláusulas e Condições Importantes</h3>
+        <p id="print-txt-observacoes">--</p>
+        <p class="print-disclaimer">
+          1. Os valores reais sofrerão reajuste de acordo com o indexador oficial publicado mês a mês pelo órgão competente. A simulação anualizada é meramente informativa para fins de planejamento do adquirente.<br>
+          2. Esta proposta não gera vínculo contratual definitivo até a efetiva assinatura do contrato de compra e venda e aprovação de toda documentação.
+        </p>
+      </div>
+
+      <!-- CAMPOS DE ASSINATURA -->
+      <div class="print-signature-row">
+        <div class="print-signature-block">
+          <div class="signature-line"></div>
+          <p><strong id="print-txt-signature-cliente">Carlos Eduardo Mendonça</strong></p>
+          <p>Proponente / Comprador</p>
+        </div>
+        <div class="print-signature-block">
+          <div class="signature-line"></div>
+          <p><strong>Representante Legal</strong></p>
+          <p id="print-txt-signature-corretora">Imobiliária Antigravity</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
