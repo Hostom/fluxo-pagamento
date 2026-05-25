@@ -114,24 +114,82 @@
 
         <!-- SEÇÃO: VALORES DO FLUXO -->
         <div class="config-section" data-section="values">
-          <h3 class="section-title"><i data-lucide="dollar-sign"></i> Valores de Tabela</h3>
+          <h3 class="section-title"><i data-lucide="dollar-sign"></i> Valores &amp; Modo de Cálculo</h3>
+
+          <!-- Campos comuns a todos os modos -->
           <div class="input-group">
             <label for="input-valor-total">Valor Total do Imóvel (R$)</label>
             <input type="text" class="money-input" id="input-valor-total" value="822.363,64">
           </div>
-          <div class="input-row">
-            <div class="input-group">
-              <label for="input-valor-entrada">Valor da Entrada (R$)</label>
-              <input type="text" class="money-input" id="input-valor-entrada" value="60.000,00">
-            </div>
-            <div class="input-group">
-              <label for="input-valor-parcela">Parcela Mensal Base (R$)</label>
-              <input type="text" class="money-input" id="input-valor-parcela" value="4.031,19">
+          <div class="input-group">
+            <label for="input-valor-entrada">Sinal / Entrada (R$)</label>
+            <input type="text" class="money-input" id="input-valor-entrada" value="60.000,00">
+          </div>
+
+          <!-- Seletor de modo -->
+          <div class="input-group">
+            <label>Modo de Cálculo</label>
+            <div class="calc-mode-tabs">
+              <button class="calc-mode-btn active" data-mode="manual" id="btn-mode-manual">
+                <i data-lucide="sliders-horizontal"></i> Manual
+              </button>
+              <button class="calc-mode-btn" data-mode="prazo" id="btn-mode-prazo">
+                <i data-lucide="calendar-clock"></i> Por Prazo
+              </button>
+              <button class="calc-mode-btn" data-mode="capacidade" id="btn-mode-capacidade">
+                <i data-lucide="wallet"></i> Por Capacidade
+              </button>
             </div>
           </div>
-          <div class="input-group">
-            <label for="input-meses">Total de Meses do Fluxo</label>
-            <input type="number" id="input-meses" min="1" max="120" value="51">
+
+          <!-- MODO MANUAL: parcela + meses definidos pelo corretor -->
+          <div id="mode-manual-fields">
+            <div class="input-row">
+              <div class="input-group">
+                <label for="input-valor-parcela">Parcela Mensal Base (R$)</label>
+                <input type="text" class="money-input" id="input-valor-parcela" value="4.031,19">
+              </div>
+              <div class="input-group">
+                <label for="input-meses">Total de Meses</label>
+                <input type="number" id="input-meses" min="1" max="360" value="51">
+              </div>
+            </div>
+          </div>
+
+          <!-- MODO POR PRAZO: meses até a entrega + % máx. a financiar → calcula parcela -->
+          <div id="mode-prazo-fields" style="display:none">
+            <div class="input-row">
+              <div class="input-group">
+                <label for="input-meses-entrega">Meses até a Entrega</label>
+                <input type="number" id="input-meses-entrega" min="1" max="360" value="48">
+              </div>
+              <div class="input-group">
+                <label for="input-perc-financiamento">% a Financiar nas Chaves</label>
+                <input type="number" id="input-perc-financiamento" min="0" max="100" step="1" value="30" placeholder="Ex: 30">
+              </div>
+            </div>
+            <div class="calc-result-hint" id="hint-parcela-sugerida">
+              <i data-lucide="lightbulb"></i>
+              <div>
+                <strong>Parcela Calculada</strong>
+                <span id="hint-parcela-valor">Preencha os campos acima.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODO POR CAPACIDADE: parcela que o cliente paga → calcula quantos meses -->
+          <div id="mode-capacidade-fields" style="display:none">
+            <div class="input-group">
+              <label for="input-capacidade-parcela">Parcela que consigo pagar (R$)</label>
+              <input type="text" class="money-input" id="input-capacidade-parcela" value="4.000,00">
+            </div>
+            <div class="calc-result-hint" id="hint-meses-calculados">
+              <i data-lucide="lightbulb"></i>
+              <div>
+                <strong>Prazo Calculado</strong>
+                <span id="hint-meses-valor">Preencha a parcela para calcular.</span>
+              </div>
+            </div>
           </div>
         </div>
 

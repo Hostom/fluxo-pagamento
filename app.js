@@ -29,6 +29,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const elBtnReforcoLimpar       = document.getElementById('btn-reforco-limpar');
   const elInputObservacoes       = document.getElementById('input-observacoes');
   const elInputCubRate           = document.getElementById('input-cub-rate');
+  // Modo de cálculo
+  const elModeBtns               = document.querySelectorAll('.calc-mode-btn');
+  const elModeManualFields       = document.getElementById('mode-manual-fields');
+  const elModePrazoFields        = document.getElementById('mode-prazo-fields');
+  const elModeCapacidadeFields   = document.getElementById('mode-capacidade-fields');
+  const elInputMesesEntrega      = document.getElementById('input-meses-entrega');
+  const elInputPercFinanciamento = document.getElementById('input-perc-financiamento');
+  const elInputCapacidadeParcela = document.getElementById('input-capacidade-parcela');
+  const elHintParcelaValor       = document.getElementById('hint-parcela-valor');
+  const elHintMesesValor         = document.getElementById('hint-meses-valor');
   const elValCubProjetado        = document.getElementById('val-cub-projetado');
 
   // Outputs dashboard
@@ -48,10 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const elBtnPdfBgClear          = document.getElementById('btn-pdf-bg-clear');
   const elPrintWatermarkBg       = document.getElementById('print-watermark-bg');
 
-  // ── Configuração de gráficos e temas ──────────────────────────────────────
+  // ── Estado global ──────────────────────────────────────────────────────────
   let chartDashboard = null;
   let chartPrint     = null;
   let activeTheme    = 'blue';
+  let calcMode       = 'manual'; // 'manual' | 'prazo' | 'capacidade'
 
   const themeColors = {
     blue:    { primary: 'hsl(210, 80%, 45%)',  success: 'hsl(152, 70%, 50%)' },
@@ -85,9 +96,41 @@ document.addEventListener('DOMContentLoaded', () => {
     input.addEventListener('change', () => processarSimulacao());
   });
 
-  [elInputMeses, elInputReforcosMeses, elInputObservacoes].forEach(el => {
+  [elInputMeses, elInputReforcosMeses, elInputObservacoes,
+   elInputMesesEntrega, elInputPercFinanciamento].forEach(el => {
+    if (el) el.addEventListener('input',  () => processarSimulacao());
     if (el) el.addEventListener('change', () => processarSimulacao());
   });
+
+  // ── Modo de cálculo — troca de abas ───────────────────────────────────────
+  elModeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      elModeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      calcMode = btn.dataset.mode;
+
+      // Mostrar/ocultar campos
+      elModeManualFields.style.display     = calcMode === 'manual'     ? '' : 'none';
+      elModePrazoFields.style.display      = calcMode === 'prazo'      ? '' : 'none';
+      elModeCapacidadeFields.style.display = calcMode === 'capacidade' ? '' : 'none';
+
+      // Re-registrar máscara monetária no campo de capacidade (caso seja primeira abertura)
+      if (calcMode === 'capacidade' && elInputCapacidadeParcela) {
+        elInputCapacidadeParcela.addEventListener('input',  () => maskMoney(elInputCapacidadeParcela));
+        elInputCapacidadeParcela.addEventListener('change', () => processarSimulacao());
+      }
+
+      // Reiniciar ícones do Lucide que podem estar nos novos campos visíveis
+      lucide.createIcons();
+      processarSimulacao();
+    });
+  });
+
+  // Registrar máscara no campo de capacidade imediatamente
+  if (elInputCapacidadeParcela) {
+    elInputCapacidadeParcela.addEventListener('input',  () => maskMoney(elInputCapacidadeParcela));
+    elInputCapacidadeParcela.addEventListener('change', () => processarSimulacao());
+  }
 
   // ── Seletor de temas ───────────────────────────────────────────────────────
   elThemeBtns.forEach(btn => {
@@ -102,8 +145,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Atalhos de reforços ────────────────────────────────────────────────────
+  function getActiveTotalMeses() {
+    if (calcMode === 'prazo')      return parseInt(elInputMesesEntrega.value) || 48;
+    if (calcMode === 'capacidade') return parseInt(elInputMeses.value)        || 12;
+    return parseInt(elInputMeses.value) || 12;
+  }
+
   elBtnReforcoSemestral.addEventListener('click', () => {
-    const totalMeses = parseInt(elInputMeses.value) || 12;
+    const totalMeses = getActiveTotalMeses();
     const meses = [];
     for (let i = 6; i < totalMeses; i += 6) meses.push(i);
     elInputReforcosMeses.value = meses.join(', ');
@@ -111,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   elBtnReforcoAnual.addEventListener('click', () => {
-    const totalMeses = parseInt(elInputMeses.value) || 12;
+    const totalMeses = getActiveTotalMeses();
     const meses = [];
     for (let i = 12; i < totalMeses; i += 12) meses.push(i);
     elInputReforcosMeses.value = meses.join(', ');
@@ -166,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── Cálculo de parcelas ────────────────────────────────────────────────────
+  // ── Cálculo de parcelas (núcleo compartilhado) ────────────────────────────
   function calcularParcelas(cubAnual, config) {
     const cubMensal = Math.pow(1 + cubAnual / 100, 1 / 12) - 1;
     const meses = [];
@@ -181,35 +230,169 @@ document.addEventListener('DOMContentLoaded', () => {
     return meses;
   }
 
-  // ── Processar simulação ────────────────────────────────────────────────────
+  // ── Modo "Por Prazo": calcula parcelaBase necessária ─────────────────────
+  // Dado: totalImovel, entrada, mesesEntrega, percFinanciamento, valorReforco, reforcosMeses
+  // Devolve: { parcelaBase, parcelaFinal, saldoNasChaves }
+  function calcularPorPrazo(totalImovel, entrada, mesesEntrega, percFinanciamento, valorReforco, reforcosMesesSet, cubAnual) {
+    const cubMensal       = Math.pow(1 + cubAnual / 100, 1 / 12) - 1;
+    const saldoAFinanciar = totalImovel * (percFinanciamento / 100); // o que ficará para depois das chaves
+    const valorMeta       = totalImovel - entrada - saldoAFinanciar; // o que precisa ser pago no fluxo
+
+    if (valorMeta <= 0) return { parcelaBase: 0, parcelaFinal: 0, saldoNasChaves: saldoAFinanciar };
+
+    // Soma total dos reforços que cabem no período
+    let totalReforcos = 0;
+    for (let m = 1; m <= mesesEntrega; m++) {
+      if (reforcosMesesSet.has(m)) totalReforcos += valorReforco;
+    }
+
+    // Soma geométrica: Σ_{m=1}^{n} (1+cub)^{m-1}
+    // Se cubMensal ≈ 0 → soma = n; caso contrário → ((1+cub)^n - 1) / cub
+    let somaGeometrica;
+    if (Math.abs(cubMensal) < 1e-9) {
+      somaGeometrica = mesesEntrega;
+    } else {
+      somaGeometrica = (Math.pow(1 + cubMensal, mesesEntrega) - 1) / cubMensal;
+    }
+
+    const valorDisponivelParcelas = Math.max(0, valorMeta - totalReforcos);
+    const parcelaBase             = valorDisponivelParcelas / somaGeometrica;
+    const parcelaFinal            = parcelaBase * Math.pow(1 + cubMensal, mesesEntrega - 1);
+
+    return { parcelaBase, parcelaFinal, saldoNasChaves: saldoAFinanciar };
+  }
+
+  // ── Modo "Por Capacidade": calcula meses necessários ─────────────────────
+  // Dado: totalImovel, entrada, parcelaCapacidade, valorReforco, reforcosMeses, cubAnual
+  // Devolve: { mesesNecessarios, saldoFinal, dados[] }
+  function calcularPorCapacidade(totalImovel, entrada, parcelaCapacidade, valorReforco, reforcosMesesSet, cubAnual) {
+    if (parcelaCapacidade <= 0) return { mesesNecessarios: 0, saldoFinal: totalImovel - entrada, dados: [] };
+    const cubMensal = Math.pow(1 + cubAnual / 100, 1 / 12) - 1;
+    const MAX_MESES = 480; // limite de segurança: 40 anos
+    let acum   = entrada;
+    const dados = [];
+    let m = 0;
+
+    while (acum < totalImovel && m < MAX_MESES) {
+      m++;
+      const parcela    = parcelaCapacidade * Math.pow(1 + cubMensal, m - 1);
+      const reforco    = reforcosMesesSet.has(m) ? valorReforco : 0;
+      const desembolso = parcela + reforco;
+      acum += desembolso;
+      dados.push({ m, parcela, reforco, desembolso, acum });
+    }
+
+    return { mesesNecessarios: m, saldoFinal: Math.max(0, totalImovel - acum), dados };
+  }
+
+  // ── Processar simulação (roteador de modos) ───────────────────────────────
   function processarSimulacao() {
     const totalImovel  = parseMoney(elInputValorTotal.value);
     const entrada      = parseMoney(elInputValorEntrada.value);
-    const parcelaBase  = parseMoney(elInputValorParcela.value);
-    const totalMeses   = parseInt(elInputMeses.value) || 1;
     const valorReforco = parseMoney(elInputValorReforco.value);
     const indexador    = elInputImovelIndexador.value || 'CUB/SC';
+    const cubAnual     = parseFloat(elInputCubRate.value) || 0;
 
-    const reforcosMeses = new Set(
-      elInputReforcosMeses.value.split(',')
-        .map(s => parseInt(s.trim()))
-        .filter(n => !isNaN(n) && n > 0 && n <= totalMeses)
-    );
+    // Reforços são compartilhados entre os modos
+    // O set será recalculado com o totalMeses correto em cada modo
+    const reforcosMesesStr = elInputReforcosMeses.value;
+    function buildReforcoSet(totalMeses) {
+      return new Set(
+        reforcosMesesStr.split(',')
+          .map(s => parseInt(s.trim()))
+          .filter(n => !isNaN(n) && n > 0 && n <= totalMeses)
+      );
+    }
 
-    const cubAnual = parseFloat(elInputCubRate.value) || 0;
+    let parcelaBase, totalMeses, dados;
 
-    const dados = calcularParcelas(cubAnual, {
-      entrada, parcelaBase, totalMeses, valorReforco, reforcosMeses
-    });
+    // ── MODO MANUAL ──────────────────────────────────────────────────────────
+    if (calcMode === 'manual') {
+      parcelaBase = parseMoney(elInputValorParcela.value);
+      totalMeses  = parseInt(elInputMeses.value) || 1;
+      const reforcosMeses = buildReforcoSet(totalMeses);
+      dados = calcularParcelas(cubAnual, { entrada, parcelaBase, totalMeses, valorReforco, reforcosMeses });
+    }
 
+    // ── MODO POR PRAZO ───────────────────────────────────────────────────────
+    else if (calcMode === 'prazo') {
+      totalMeses = parseInt(elInputMesesEntrega.value) || 48;
+      const percFinanciamento = parseFloat(elInputPercFinanciamento.value) || 0;
+      const reforcosMeses = buildReforcoSet(totalMeses);
+
+      const res = calcularPorPrazo(
+        totalImovel, entrada, totalMeses, percFinanciamento,
+        valorReforco, reforcosMeses, cubAnual
+      );
+      parcelaBase = res.parcelaBase;
+
+      // Mostrar resultado no hint
+      if (elHintParcelaValor && res.parcelaBase > 0) {
+        const cubMensal = Math.pow(1 + cubAnual / 100, 1 / 12) - 1;
+        const parcelaFinal = res.parcelaBase * Math.pow(1 + cubMensal, totalMeses - 1);
+        elHintParcelaValor.innerHTML =
+          `<span class="hint-value">${fmt(res.parcelaBase)}</span> no 1° mês` +
+          `<span class="hint-detail">→ ${fmt(parcelaFinal)} na entrega · Saldo a financiar: ${fmt(res.saldoNasChaves)}</span>`;
+      } else if (elHintParcelaValor) {
+        elHintParcelaValor.textContent = 'Preencha os campos acima.';
+      }
+
+      // Sincronizar campo manual para o PDF usar
+      if (elInputValorParcela) {
+        elInputValorParcela.value = parcelaBase.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      if (elInputMeses) elInputMeses.value = totalMeses;
+
+      dados = calcularParcelas(cubAnual, { entrada, parcelaBase, totalMeses, valorReforco, reforcosMeses });
+    }
+
+    // ── MODO POR CAPACIDADE ──────────────────────────────────────────────────
+    else {
+      const parcelaCapacidade = parseMoney(elInputCapacidadeParcela.value);
+      // Usamos um set ilimitado para pré-cálculo, depois filtramos pelo resultado
+      const reforcosMesesIlimitado = new Set(
+        reforcosMesesStr.split(',')
+          .map(s => parseInt(s.trim()))
+          .filter(n => !isNaN(n) && n > 0)
+      );
+
+      const res = calcularPorCapacidade(
+        totalImovel, entrada, parcelaCapacidade,
+        valorReforco, reforcosMesesIlimitado, cubAnual
+      );
+      parcelaBase = parcelaCapacidade;
+      totalMeses  = res.mesesNecessarios;
+      dados       = res.dados;
+
+      // Mostrar resultado no hint
+      if (elHintMesesValor && totalMeses > 0) {
+        const anos  = Math.floor(totalMeses / 12);
+        const mRest = totalMeses % 12;
+        const prazoStr = anos > 0
+          ? `${anos} ano${anos > 1 ? 's' : ''}${mRest > 0 ? ` e ${mRest} mês${mRest > 1 ? 'es' : ''}` : ''}`
+          : `${totalMeses} mês${totalMeses > 1 ? 'es' : ''}`;
+        elHintMesesValor.innerHTML =
+          `<span class="hint-value">${totalMeses} parcelas</span> (${prazoStr})` +
+          `<span class="hint-detail">Parcela inicial: ${fmt(parcelaCapacidade)}</span>`;
+      } else if (elHintMesesValor) {
+        elHintMesesValor.textContent = 'Preencha a parcela para calcular.';
+      }
+
+      // Sincronizar campos manuais
+      if (elInputValorParcela) {
+        elInputValorParcela.value = parcelaBase.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      if (elInputMeses) elInputMeses.value = totalMeses;
+    }
+
+    // ── Métricas comuns ──────────────────────────────────────────────────────
     const totalPagoFluxo  = dados.length > 0 ? dados[dados.length - 1].acum : entrada;
     const saldoAFinanciar = Math.max(0, totalImovel - totalPagoFluxo);
 
-    // Atualizar KPIs
-    elValTotal.textContent    = fmt(totalImovel);
-    elValEntrada.textContent  = fmt(entrada);
-    elValPago.textContent     = fmt(totalPagoFluxo);
-    elValSaldo.textContent    = fmt(saldoAFinanciar);
+    elValTotal.textContent      = fmt(totalImovel);
+    elValEntrada.textContent    = fmt(entrada);
+    elValPago.textContent       = fmt(totalPagoFluxo);
+    elValSaldo.textContent      = fmt(saldoAFinanciar);
     elLblTotalMeses.textContent = `Pago em ${totalMeses} meses (Entrada + Parcelas)`;
     elBadgeMeses.textContent    = `${totalMeses} parcelas mensais`;
 
@@ -217,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.textContent = indexador;
     });
 
-    // Tabela do dashboard
+    // ── Tabela do dashboard ──────────────────────────────────────────────────
     elTabelaDashboard.innerHTML = '';
     dados.forEach(d => {
       const tr = document.createElement('tr');
