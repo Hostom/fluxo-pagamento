@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const elBadgeMeses             = document.getElementById('badge-meses');
   const elTabelaDashboard        = document.getElementById('tabela-dashboard');
   const elBtnImprimir            = document.getElementById('btn-imprimir');
+  const elBtnBaixarPdf           = document.getElementById('btn-baixar-pdf');
 
   // ── Configuração de gráficos e temas ──────────────────────────────────────
   let chartDashboard = null;
@@ -289,8 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── Geração do PDF ─────────────────────────────────────────────────────────
-  elBtnImprimir.addEventListener('click', () => {
+  // ── Preparar Dados do Template do PDF ──────────────────────────────────────
+  function prepararTemplatePrint() {
     const corretora        = elInputCorretora.value   || 'Imobiliária Antigravity';
     const clienteNome      = elInputClienteNome.value || 'Carlos Eduardo Mendonça';
     const clienteEmail     = elInputClienteEmail.value;
@@ -360,11 +361,79 @@ document.addEventListener('DOMContentLoaded', () => {
       elTabelaPrint.appendChild(tr);
     });
 
-    // Desenhar gráfico de impressão e chamar print
-    desenharGraficoPrint(dados, () => {
-      setTimeout(() => window.print(), 300);
+    return dados;
+  }
+
+  // ── Geração do PDF e Impressão do Navegador ────────────────────────────────
+  if (elBtnImprimir) {
+    elBtnImprimir.addEventListener('click', () => {
+      const dados = prepararTemplatePrint();
+      
+      desenharGraficoPrint(dados, () => {
+        setTimeout(() => window.print(), 350);
+      });
     });
-  });
+  }
+
+  // ── Geração e Download Direto do PDF (html2pdf.js) ─────────────────────────
+  if (elBtnBaixarPdf) {
+    elBtnBaixarPdf.addEventListener('click', () => {
+      const dados = prepararTemplatePrint();
+      const elPrintContainer = document.getElementById('print-template');
+      
+      // Armazenar os estados originais do CSS do contêiner
+      const originalDisplay  = elPrintContainer.style.display;
+      const originalPosition = elPrintContainer.style.position;
+      const originalLeft     = elPrintContainer.style.left;
+      const originalWidth    = elPrintContainer.style.width;
+      const originalBg       = elPrintContainer.style.background;
+      const originalColor    = elPrintContainer.style.color;
+
+      // Forçar exibição temporária em posição invisível para o html2pdf.js renderizar
+      elPrintContainer.style.display    = 'block';
+      elPrintContainer.style.position   = 'absolute';
+      elPrintContainer.style.left       = '-9999px';
+      elPrintContainer.style.width      = '760px'; // Largura otimizada para A4
+      elPrintContainer.style.background = '#ffffff';
+      elPrintContainer.style.color      = '#1e293b';
+      elPrintContainer.classList.add('active-pdf-rendering');
+
+      // Gerar um nome de arquivo profissional e sanitizado
+      const rawCliente = elInputClienteNome.value || 'Cliente';
+      const rawImovel  = elInputImovelNome.value || 'Imovel';
+      const cleanCliente = rawCliente.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9\s]/g, "").trim().replace(/\s+/g, '_');
+      const cleanImovel  = rawImovel.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9\s]/g, "").trim().replace(/\s+/g, '_');
+      const filename     = `Proposta_${cleanCliente}_${cleanImovel}.pdf`;
+
+      // Opções avançadas de alta fidelidade para o html2pdf
+      const options = {
+        margin:       [12, 14, 12, 14], // Margens milimetricamente idênticas à folha impressa
+        filename:     filename,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+          scale: 2, 
+          useCORS: true, 
+          letterRendering: true,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      desenharGraficoPrint(dados, () => {
+        // Chamar html2pdf e salvar o arquivo
+        html2pdf().set(options).from(elPrintContainer).save().then(() => {
+          // Restaurar estados originais do elemento na tela
+          elPrintContainer.style.display    = originalDisplay;
+          elPrintContainer.style.position   = originalPosition;
+          elPrintContainer.style.left       = originalLeft;
+          elPrintContainer.style.width      = originalWidth;
+          elPrintContainer.style.background = originalBg;
+          elPrintContainer.style.color      = originalColor;
+          elPrintContainer.classList.remove('active-pdf-rendering');
+        });
+      });
+    });
+  }
 
   function desenharGraficoPrint(dados, callback) {
     const elPrintContainer = document.getElementById('print-template');

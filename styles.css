@@ -477,6 +477,38 @@ select:focus {
 .btn-primary:active { transform: translateY(0); }
 .btn-primary i { width: 18px; height: 18px; }
 
+/* ============ BOTÃO SECUNDÁRIO ============ */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-strong);
+  color: var(--text-main);
+  padding: 13px 22px;
+  border-radius: var(--r-md);
+  font-family: var(--font-title);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: var(--t-normal);
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.btn-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+.btn-secondary i { width: 18px; height: 18px; transition: color var(--t-fast); }
+.btn-secondary:hover i { color: var(--primary); }
+
 /* ============ CARDS DE MÉTRICAS ============ */
 .metrics-grid {
   display: grid;
@@ -806,359 +838,416 @@ tr.reforco td { font-weight: 600; }
 
 
 /* ===========================================================================
-   FOLHA DE IMPRESSÃO EXECUTIVA — @media print (PROPOSTA COMERCIAL A4)
+   SISTEMA DE DOWNLOAD E IMPRESSÃO DE PDF EXECUTIVO (A4 PORTRAIT)
    =========================================================================== */
 
-.print-only { display: none; }
+/* Ocultar o template de impressão na interface normal do app */
+#print-template {
+  display: none;
+  box-sizing: border-box;
+}
 
+/* Estilos globais para o template do PDF (disponível tanto para html2pdf quanto para @media print) */
+#print-template.active-pdf-rendering,
+#print-template {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+  line-height: 1.5;
+}
+
+#print-template * {
+  box-sizing: border-box;
+}
+
+/* ---- CABEÇALHO DA PROPOSTA ---- */
+#print-template .print-header {
+  margin-bottom: 14px;
+}
+
+#print-template .print-header-bar {
+  height: 5px;
+  background: linear-gradient(90deg, #1e7fcb 0%, #0d4f8c 60%, #092a4d 100%);
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+#print-template .print-brand-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+#print-template .print-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#print-template .print-logo-icon {
+  width: 32px;
+  height: 32px;
+  color: #1e7fcb;
+}
+
+#print-template .print-logo h1 {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #0d1826;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+#print-template .print-logo p {
+  font-size: 9px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 1px;
+}
+
+#print-template .print-meta-right {
+  text-align: right;
+}
+
+#print-template .print-meta-item {
+  font-size: 9.5px;
+  color: #475569;
+  margin-bottom: 2px;
+}
+
+#print-template .print-meta-badge {
+  display: inline-block;
+  margin-top: 4px;
+  background: #1e7fcb;
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2.5px 8px;
+  border-radius: 10px;
+}
+
+#print-template .print-divider {
+  height: 1px;
+  background: linear-gradient(90deg, #1e7fcb 0%, #cbd5e1 100%);
+  margin: 10px 0;
+}
+
+/* ---- GRID DE DADOS CLIENTE / IMÓVEL ---- */
+#print-template .print-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+#print-template .print-info-block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #1e7fcb;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+#print-template .print-info-block h3 {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #1e7fcb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#print-template .print-info-block h3 i {
+  width: 10px;
+  height: 10px;
+}
+
+#print-template .print-info-block p {
+  font-size: 10px;
+  color: #334155;
+  margin: 0 0 2px 0;
+  line-height: 1.35;
+}
+
+#print-template .print-info-block p strong {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0d1826;
+}
+
+/* ---- SEÇÕES INTERNAS ---- */
+#print-template .print-section {
+  margin-bottom: 12px;
+}
+
+#print-template .print-section-title {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0d1826;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#print-template .title-bar {
+  display: inline-block;
+  width: 3.5px;
+  height: 12px;
+  background: #1e7fcb;
+  border-radius: 1.5px;
+}
+
+#print-template .print-section-subtitle {
+  font-size: 9px;
+  color: #64748b;
+  margin: 0 0 6px 0;
+}
+
+/* ---- CARDS DE MÉTRICAS NO PDF ---- */
+#print-template .print-metrics-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+#print-template .print-summary-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+#print-template .print-summary-card.highlighted {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  border-top: 2px solid #1e7fcb;
+}
+
+#print-template .print-summary-card .lbl {
+  font-size: 8px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+#print-template .print-summary-card .val {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #0d1826;
+}
+
+#print-template .print-summary-card.highlighted .val {
+  color: #1e7fcb;
+}
+
+#print-template .print-summary-card .sub-lbl {
+  font-size: 7.5px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+/* ---- GRÁFICO DO PDF ---- */
+#print-template .print-chart-container {
+  height: 150px;
+  position: relative;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px;
+  background: #fafbfc;
+}
+
+/* ---- TABELA DO PDF ---- */
+#print-template .print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+  margin-top: 4px;
+}
+
+#print-template .print-table thead tr {
+  background: #0d1826;
+}
+
+#print-template .print-table th {
+  padding: 6px 8px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  text-align: left;
+}
+
+#print-template .print-table th:first-child { border-radius: 4px 0 0 4px; }
+#print-template .print-table th:last-child { border-radius: 0 4px 4px 0; }
+
+#print-template .print-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  vertical-align: middle;
+}
+
+#print-template .print-table tr:nth-child(even) td {
+  background: #fafbfc;
+}
+
+#print-template .print-table tr.reforco td {
+  font-weight: 700;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+#print-template .print-table .tag-reforco {
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2.5px;
+  margin-left: 4px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* ---- QUEBRAS DE PÁGINA ---- */
+#print-template .page-break {
+  page-break-before: always;
+  break-before: page;
+}
+
+#print-template .page-break-avoid {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* ---- OBSERVAÇÕES & ASSINATURAS DO PDF ---- */
+#print-template .print-terms {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+#print-template .print-terms h3 {
+  font-size: 9.5px;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+  color: #0d1826;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+#print-template .print-terms p {
+  font-size: 9px;
+  color: #475569;
+  line-height: 1.4;
+  margin: 0;
+}
+
+#print-template .print-disclaimer {
+  font-size: 8px;
+  color: #64748b;
+  margin-top: 6px;
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 4px;
+  line-height: 1.4;
+}
+
+#print-template .print-signature-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  gap: 40px;
+}
+
+#print-template .print-signature-block {
+  flex: 1;
+  text-align: center;
+}
+
+#print-template .signature-line {
+  border-bottom: 1px solid #475569;
+  margin-bottom: 6px;
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#print-template .print-signature-block p {
+  font-size: 9px;
+  color: #64748b;
+  margin: 0;
+}
+
+#print-template .print-signature-block p strong {
+  font-size: 9.5px;
+  color: #0d1826;
+  display: block;
+  margin-bottom: 1px;
+}
+
+
+/* ===========================================================================
+   REGRAS ESPECÍFICAS DE IMPRESSÃO (@media print)
+   =========================================================================== */
 @media print {
-
   @page {
     size: A4 portrait;
-    margin: 14mm 16mm 16mm 16mm;
+    margin: 10mm 12mm 10mm 12mm;
   }
 
-  .no-print,
-  .sidebar,
-  .main-content,
-  #app-container,
-  .bg-layer {
-    display: none !important;
-  }
-
-  .print-only {
-    display: block !important;
+  /* Reset completo do body na impressão para impedir vazamento de fundo escuro */
+  html, body {
     background: #ffffff !important;
-    color: #111111 !important;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 11px;
-  }
-
-  * {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* ---- CABEÇALHO DA PROPOSTA ---- */
-  .print-header {
-    margin-bottom: 18px;
+  /* Esconder todos os elementos de visualização em tela */
+  .no-print,
+  .sidebar,
+  .main-content,
+  #app-container,
+  .bg-layer,
+  .theme-btn,
+  header.main-header {
+    display: none !important;
   }
 
-  .print-header-bar {
-    height: 5px;
-    background: linear-gradient(90deg, #1e7fcb 0%, #0d4f8c 60%, #092a4d 100%);
-    border-radius: 3px;
-    margin-bottom: 14px;
-  }
-
-  .print-brand-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-
-  .print-logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .print-logo-icon {
-    width: 36px; height: 36px;
-    color: #1e7fcb;
-  }
-
-  .print-logo h1 {
-    font-family: 'Outfit', system-ui, sans-serif;
-    font-size: 20px;
-    font-weight: 800;
-    color: #0d1826;
-    letter-spacing: -0.5px;
-    margin: 0;
-  }
-
-  .print-logo p {
-    font-size: 10px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 2px;
-  }
-
-  .print-meta-right {
-    text-align: right;
-  }
-
-  .print-meta-item {
-    font-size: 10px;
-    color: #475569;
-    margin-bottom: 3px;
-  }
-
-  .print-meta-badge {
-    display: inline-block;
-    margin-top: 6px;
-    background: #1e7fcb;
-    color: #ffffff;
-    font-size: 8px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 12px;
-  }
-
-  .print-divider {
-    height: 1px;
-    background: linear-gradient(90deg, #1e7fcb 0%, #e2e8f0 100%);
-    margin: 12px 0;
-  }
-
-  /* ---- GRID DE INFO ---- */
-  .print-info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 12px;
-  }
-
-  .print-info-block {
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0;
-    border-left: 3px solid #1e7fcb;
-    border-radius: 6px;
-    padding: 12px 14px;
-  }
-
-  .print-info-block h3 {
-    font-family: 'Outfit', system-ui, sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    color: #1e7fcb !important;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .print-info-block h3 i { width: 11px; height: 11px; }
-
-  .print-info-block p {
-    font-size: 11px;
-    color: #1e293b;
-    margin-bottom: 3px;
-    line-height: 1.4;
-  }
-
-  .print-info-block p strong { font-size: 12px; font-weight: 700; }
-
-  /* ---- SEÇÕES GERAIS ---- */
-  .print-section { margin-bottom: 18px; }
-
-  .print-section-title {
-    font-family: 'Outfit', system-ui, sans-serif;
-    font-size: 12px;
-    font-weight: 800;
-    color: #0d1826 !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .title-bar {
-    display: inline-block;
-    width: 4px;
-    height: 14px;
-    background: #1e7fcb;
-    border-radius: 2px;
-  }
-
-  .print-section-subtitle {
-    font-size: 9.5px;
-    color: #64748b;
-    margin-bottom: 8px;
-    line-height: 1.5;
-  }
-
-  /* ---- CARDS MÉTRICAS DO PDF ---- */
-  .print-metrics-summary {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
-
-  .print-summary-card {
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    gap: 3px;
-  }
-
-  .print-summary-card.highlighted {
-    background: #eff6ff !important;
-    border-color: #93c5fd;
-    border-top: 2px solid #1e7fcb;
-  }
-
-  .print-summary-card .lbl {
-    font-size: 8.5px;
-    color: #64748b;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-
-  .print-summary-card .val {
-    font-family: 'Outfit', system-ui, sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    color: #0d1826;
-  }
-
-  .print-summary-card.highlighted .val { color: #1e7fcb !important; }
-
-  .print-summary-card .sub-lbl {
-    font-size: 8px;
-    color: #64748b;
-  }
-
-  /* ---- GRÁFICO ---- */
-  .print-chart-container {
-    height: 170px;
-    position: relative;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px;
-    background: #fafbfc !important;
-  }
-
-  /* ---- TABELA ---- */
-  .print-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 9.5px;
-  }
-
-  .print-table thead tr {
-    background: #0d1826 !important;
-  }
-
-  .print-table th {
-    padding: 7px 9px;
-    color: #ffffff !important;
-    font-weight: 700;
-    font-size: 8.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    border: none;
-  }
-
-  .print-table th:first-child { border-radius: 4px 0 0 4px; }
-  .print-table th:last-child { border-radius: 0 4px 4px 0; }
-
-  .print-table td {
-    padding: 6px 9px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #1e293b;
-    vertical-align: middle;
-  }
-
-  .print-table tr:nth-child(even) td { background: #fafbfc !important; }
-
-  .print-table tr.reforco td {
-    font-weight: 700;
-    background: #f0fdf4 !important;
-    color: #15803d;
-  }
-
-  .print-table .tag-reforco {
-    background: #16a34a !important;
-    color: #ffffff !important;
-    font-size: 7.5px;
-    font-weight: 700;
-    padding: 1.5px 5px;
-    border-radius: 3px;
-    margin-left: 5px;
-    vertical-align: middle;
-  }
-
-  /* ---- QUEBRAS DE PÁGINA ---- */
-  .page-break { page-break-before: always; }
-  .page-break-avoid { page-break-inside: avoid; }
-
-  /* ---- CLÁUSULAS ---- */
-  .print-terms {
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 14px;
-    margin-top: 12px;
-  }
-
-  .print-terms h3 {
-    font-size: 10px;
-    font-weight: 800;
-    margin-bottom: 6px;
-    color: #0d1826;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .print-terms p {
-    font-size: 10px;
-    color: #334155;
-    line-height: 1.55;
-  }
-
-  .print-disclaimer {
-    font-size: 8.5px;
-    color: #64748b;
-    margin-top: 8px;
-    border-top: 1px dashed #cbd5e1;
-    padding-top: 6px;
-    line-height: 1.6;
-  }
-
-  /* ---- ASSINATURAS ---- */
-  .print-signature-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 40px;
-    gap: 60px;
-  }
-
-  .print-signature-block {
-    flex: 1;
-    text-align: center;
-  }
-
-  .signature-line {
-    border-bottom: 1.5px solid #334155;
-    margin-bottom: 8px;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .print-signature-block p {
-    font-size: 10px;
-    color: #475569;
-    margin-bottom: 1px;
-  }
-
-  .print-signature-block p strong {
-    font-size: 11px;
-    color: #0d1826;
-    display: block;
-    margin-bottom: 2px;
+  /* Forçar a exibição do template do PDF na impressão */
+  #print-template {
+    display: block !important;
+    visibility: visible !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }

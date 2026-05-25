@@ -15,6 +15,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <!-- GSAP + ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- html2pdf.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="theme-blue">
@@ -178,10 +180,14 @@
           <h1>Simulador de Fluxo de Pagamento</h1>
           <p>Configure os parâmetros ao lado para projetar o fluxo financeiro reajustado pelo <span class="lbl-indexador">CUB/SC</span>.</p>
         </div>
-        <div class="header-actions">
-          <button class="btn-primary" id="btn-imprimir">
+        <div class="header-actions" style="display: flex; gap: 12px;">
+          <button class="btn-secondary" id="btn-imprimir">
+            <i data-lucide="printer"></i>
+            Imprimir
+          </button>
+          <button class="btn-primary" id="btn-baixar-pdf">
             <i data-lucide="file-down"></i>
-            Gerar PDF Profissional
+            Baixar PDF
           </button>
         </div>
       </header>
@@ -363,7 +369,7 @@
       </div>
     </section>
 
-    <div class="page-break"></div>
+
 
     <!-- TABELA COMPLETA -->
     <section class="print-section">
