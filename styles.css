@@ -869,7 +869,7 @@ tr.reforco td { font-weight: 600; }
 
 #print-template .print-header-bar {
   height: 5px;
-  background: linear-gradient(90deg, #1e7fcb 0%, #0d4f8c 60%, #092a4d 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 60%, #092a4d 100%);
   border-radius: 3px;
   margin-bottom: 10px;
 }
@@ -889,7 +889,7 @@ tr.reforco td { font-weight: 600; }
 #print-template .print-logo-icon {
   width: 32px;
   height: 32px;
-  color: #1e7fcb;
+  color: var(--primary);
 }
 
 #print-template .print-logo h1 {
@@ -922,7 +922,7 @@ tr.reforco td { font-weight: 600; }
 #print-template .print-meta-badge {
   display: inline-block;
   margin-top: 4px;
-  background: #1e7fcb;
+  background: var(--primary);
   color: #ffffff;
   font-size: 8px;
   font-weight: 700;
@@ -934,7 +934,7 @@ tr.reforco td { font-weight: 600; }
 
 #print-template .print-divider {
   height: 1px;
-  background: linear-gradient(90deg, #1e7fcb 0%, #cbd5e1 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, #cbd5e1 100%);
   margin: 10px 0;
 }
 
@@ -949,7 +949,7 @@ tr.reforco td { font-weight: 600; }
 #print-template .print-info-block {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-left: 3px solid #1e7fcb;
+  border-left: 3px solid var(--primary);
   border-radius: 6px;
   padding: 10px 12px;
 }
@@ -958,7 +958,7 @@ tr.reforco td { font-weight: 600; }
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: 9.5px;
   font-weight: 700;
-  color: #1e7fcb;
+  color: var(--primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 6px 0;
@@ -1007,7 +1007,7 @@ tr.reforco td { font-weight: 600; }
   display: inline-block;
   width: 3.5px;
   height: 12px;
-  background: #1e7fcb;
+  background: var(--primary);
   border-radius: 1.5px;
 }
 
@@ -1037,9 +1037,9 @@ tr.reforco td { font-weight: 600; }
 }
 
 #print-template .print-summary-card.highlighted {
-  background: #eff6ff;
-  border-color: #93c5fd;
-  border-top: 2px solid #1e7fcb;
+  background: var(--primary-glass) !important;
+  border-color: var(--primary-dim);
+  border-top: 2px solid var(--primary);
 }
 
 #print-template .print-summary-card .lbl {
@@ -1058,7 +1058,7 @@ tr.reforco td { font-weight: 600; }
 }
 
 #print-template .print-summary-card.highlighted .val {
-  color: #1e7fcb;
+  color: var(--primary);
 }
 
 #print-template .print-summary-card .sub-lbl {

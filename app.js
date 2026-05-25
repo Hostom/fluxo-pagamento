@@ -444,6 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elPrintContainer.style.left = '-9999px';
 
     const ctx = document.getElementById('grafico-print').getContext('2d');
+    const colors = themeColors[activeTheme]; // Obter as cores dinâmicas do tema ativo!
 
     const labels         = dados.map(d => 'M' + d.m);
     const dataNormais    = dados.map(d => d.reforco === 0 ? parseFloat(d.parcela.toFixed(2)) : null);
@@ -459,14 +460,14 @@ document.addEventListener('DOMContentLoaded', () => {
           {
             label: 'Parcela mensal',
             data: dataNormais,
-            backgroundColor: '#1e7fcb',
+            backgroundColor: colors.primary, // Cor primária dinâmica do tema ativo
             borderRadius: 3,
             skipNull: true,
           },
           {
             label: 'Mês com reforço',
             data: dataComReforco,
-            backgroundColor: '#16a34a',
+            backgroundColor: colors.success, // Cor de sucesso/reforço dinâmica do tema ativo
             borderRadius: 3,
             skipNull: true,
           }
