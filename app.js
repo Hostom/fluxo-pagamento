@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
       elPrintContainer.style.display    = 'block';
       elPrintContainer.style.position   = 'absolute';
       elPrintContainer.style.left       = '-9999px';
-      elPrintContainer.style.width      = '760px'; // Largura otimizada para A4
+      elPrintContainer.style.width      = '210mm'; // Largura perfeita A4 1:1 com a impressão
       elPrintContainer.style.background = '#ffffff';
       elPrintContainer.style.color      = '#1e293b';
       elPrintContainer.classList.add('active-pdf-rendering');
@@ -407,14 +407,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Opções avançadas de alta fidelidade para o html2pdf
       const options = {
-        margin:       [12, 14, 12, 14], // Margens milimetricamente idênticas à folha impressa
+        margin:       0, // Zerada pois as margens já são dadas via CSS (padding: 12mm 14mm) no próprio contêiner!
         filename:     filename,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { 
           scale: 2, 
           useCORS: true, 
           letterRendering: true,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          width: 793 // A4 em pixels a 96 DPI (210mm = ~793px) para proporção perfeita
         },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };

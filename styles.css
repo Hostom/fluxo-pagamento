@@ -853,6 +853,9 @@ tr.reforco td { font-weight: 600; }
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: #1e293b;
   line-height: 1.5;
+  width: 210mm; /* Largura perfeita de uma página A4 */
+  padding: 12mm 14mm; /* Margens internas aplicadas diretamente no contêiner para evitar cortes no canvas */
+  background: #ffffff;
 }
 
 #print-template * {
@@ -1214,7 +1217,7 @@ tr.reforco td { font-weight: 600; }
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm 12mm 10mm 12mm;
+    margin: 0; /* Zerada para usar o padding interno do print-template */
   }
 
   /* Reset completo do body na impressão para impedir vazamento de fundo escuro */
@@ -1246,8 +1249,8 @@ tr.reforco td { font-weight: 600; }
     visibility: visible !important;
     background: #ffffff !important;
     color: #1e293b !important;
-    width: 100% !important;
+    width: 210mm !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 12mm 14mm !important;
   }
 }
